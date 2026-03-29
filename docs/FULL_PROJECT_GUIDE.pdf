@@ -1,0 +1,907 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Pages /Count 20 /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R 26 0 R 28 0 R 30 0 R 32 0 R 34 0 R 36 0 R 38 0 R 40 0 R 42 0 R 44 0 R] >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+5 0 obj
+<< /Length 3280 >>
+stream
+BT /F2 20.00 Tf 1 0 0 1 48.00 744.00 Tm (FollowThru Full Project Guide) Tj ET
+BT /F2 14.00 Tf 1 0 0 1 48.00 703.00 Tm (1. What This Project Is) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 670.00 Tm (FollowThru is a FastAPI backend that helps turn messy meeting inputs into structured) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 657.00 Tm (execution output.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 631.00 Tm (At a high level, it does four jobs:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 605.00 Tm (1. It accepts meeting content from APIs, Slack slash commands, Slack DMs, Slack app) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 592.00 Tm (mentions, and now Zoom recording links.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 579.00 Tm (2. It extracts structured intelligence such as summary, action items, decisions, risks,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 566.00 Tm (and open questions.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 553.00 Tm (3. It turns that intelligence into Slack Canvas markdown.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 540.00 Tm (4. It stores workflow state in a relational database and optionally publishes the result) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 527.00 Tm (back to Slack.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 501.00 Tm (So the real product idea is:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 475.00 Tm (- Input: notes, transcript, voice-command transcript, uploaded transcript file, or) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 462.00 Tm (recording link.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 449.00 Tm (- Processing: parse, summarize, extract execution intelligence.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 436.00 Tm (- Output: a draft, a preview, chat guidance, or a published Slack Canvas.) Tj ET
+BT /F2 14.00 Tf 1 0 0 1 48.00 410.00 Tm (2. Architectural Style) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 377.00 Tm (The codebase is organized in layered form:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 351.00 Tm (- `app/api`: HTTP entry points.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 338.00 Tm (- `app/slack`: Slack-specific entry points and handlers.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 325.00 Tm (- `app/domain`: business logic and schemas.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 312.00 Tm (- `app/integrations`: wrappers around external systems like Slack and OpenAI.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 299.00 Tm (- `app/db`: persistence models, engine, sessions, and migrations.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 286.00 Tm (- `app/workers`: background-processing components for Celery tasks.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 260.00 Tm (This layout is useful because it separates:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 234.00 Tm (- transport logic from business logic,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 221.00 Tm (- pure workflow code from vendor APIs,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 208.00 Tm (- sync request handling from async background jobs,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 195.00 Tm (- data schemas from persistence schemas.) Tj ET
+BT /F2 14.00 Tf 1 0 0 1 48.00 169.00 Tm (3. Full Directory Structure) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 136.00 Tm (### Root) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 110.00 Tm (- `.editorconfig`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 97.00 Tm (Controls basic formatting consistency across editors.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 84.00 Tm (- `.gitignore`) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 3579 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 48.00 744.00 Tm (Tells Git which files to ignore.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 731.00 Tm (- `.pre-commit-config.yaml`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 718.00 Tm (Defines code quality hooks for local development.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 705.00 Tm (- `alembic.ini`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 692.00 Tm (Alembic configuration for database migrations.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 679.00 Tm (- `compose.yml`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 666.00 Tm (Docker Compose setup for local PostgreSQL.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 653.00 Tm (- `fix_db.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 640.00 Tm (Utility script for database-related manual fixes.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 627.00 Tm (- `pyproject.toml`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 614.00 Tm (Python project metadata and tool configuration.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 601.00 Tm (- `README.md`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 588.00 Tm (Project introduction and quick start.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 575.00 Tm (- `requirements.txt`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 562.00 Tm (Python dependency list for runtime and development.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 536.00 Tm (### `app/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 510.00 Tm (- `config.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 497.00 Tm (Central settings model. Reads environment variables and provides resolved config values.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 484.00 Tm (- `dependencies.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 471.00 Tm (FastAPI dependency helpers, currently DB session injection.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 458.00 Tm (- `logger.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 445.00 Tm (Logging setup.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 432.00 Tm (- `main.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 419.00 Tm (FastAPI app bootstrap and router registration.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 393.00 Tm (### `app/api/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 367.00 Tm (- `routes/followthru.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 354.00 Tm (Chat, capabilities, and voice-command API routes.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 341.00 Tm (- `routes/health.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 328.00 Tm (Liveness and database health endpoints.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 315.00 Tm (- `routes/slack_commands.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 302.00 Tm (FastAPI bridge for Slack slash commands.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 289.00 Tm (- `routes/slack_interactions.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 276.00 Tm (FastAPI bridge for Slack interactivity payloads.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 263.00 Tm (- `routes/workflows.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 250.00 Tm (Direct API routes for previewing and processing text workflows.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 224.00 Tm (### `app/db/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 198.00 Tm (- `base.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 185.00 Tm (SQLAlchemy engine and declarative base.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 172.00 Tm (- `session.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 159.00 Tm (SQLAlchemy session factory.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 146.00 Tm (- `migrations/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 133.00 Tm (Alembic migration files and migration environment.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 120.00 Tm (- `models/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 107.00 Tm (SQLAlchemy ORM models for the app?s persisted state.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 81.00 Tm (### `app/domain/`) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 3530 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 60.00 744.00 Tm (- `schemas/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 731.00 Tm (Pydantic request/response and structured data models.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 718.00 Tm (- `services/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 705.00 Tm (Business logic for extraction, drafting, chat orchestration, dynamic extraction, and) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 692.00 Tm (transcription.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 666.00 Tm (### `app/integrations/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 640.00 Tm (- `openai_client.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 627.00 Tm (Wrapper for OpenAI-compatible chat/extraction calls used by the synchronous workflow.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 614.00 Tm (- `slack_client.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 601.00 Tm (Wrapper around Slack Web API operations like canvases, files, and messages.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 575.00 Tm (### `app/slack/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 549.00 Tm (- `bolt_app.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 536.00 Tm (Slack Bolt bootstrap and listener registration.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 523.00 Tm (- `handlers/commands.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 510.00 Tm (Slash command, app mention, and DM event behavior.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 497.00 Tm (- `handlers/interactions.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 484.00 Tm (Modal submission handling for the async video workflow.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 471.00 Tm (- `services/source_resolver.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 458.00 Tm (Slack-aware source discovery and source persistence.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 445.00 Tm (- `services/dm_ingestion_service.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 432.00 Tm (Alternate ingestion-oriented DM workflow scaffold.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 419.00 Tm (- `services/dm_response_builder.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 406.00 Tm (DM response helper surface.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 393.00 Tm (- `views/canvas_modal.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 380.00 Tm (Slack modal builder for selecting what to extract from a recording.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 354.00 Tm (### `app/workers/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 328.00 Tm (- `celery_app.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 315.00 Tm (Celery app configuration.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 302.00 Tm (- `media_processor.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 289.00 Tm (FFmpeg-based audio extraction and chunking.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 276.00 Tm (- `tasks.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 263.00 Tm (Background orchestration task for meeting recordings.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 237.00 Tm (### `docs/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 211.00 Tm (- `PROJECT_STRUCTURE.md`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 198.00 Tm (High-level structure summary.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 185.00 Tm (- `RUNNING.md`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 172.00 Tm (Local run instructions.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 159.00 Tm (- `LAUNCH_CHECKLIST.md`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 146.00 Tm (Release or launch checklist.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 133.00 Tm (- `followthru_architecture_diagrams.md`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 120.00 Tm (Mermaid-based architecture docs.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 107.00 Tm (- `FULL_PROJECT_GUIDE.md`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 94.00 Tm (This full explanation document.) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 3085 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 48.00 744.00 Tm (### `diagrams/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 718.00 Tm (- `generate_architecture_diagrams_pdf.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 705.00 Tm (Generates a PDF version of the architecture diagrams without external PDF libraries.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 692.00 Tm (- image files) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 679.00 Tm (Diagram exports.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 653.00 Tm (### `scripts/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 627.00 Tm (- `dev.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 614.00 Tm (Starts the FastAPI server in reload mode.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 601.00 Tm (- `seed.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 588.00 Tm (Prints sample meeting text for manual testing.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 562.00 Tm (### `tests/unit/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 536.00 Tm (Unit tests for routes, services, Slack behavior, source resolution, canvas generation, and) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 523.00 Tm (ingestion workflows.) Tj ET
+BT /F2 14.00 Tf 1 0 0 1 48.00 497.00 Tm (4. Main Runtime Flows) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 464.00 Tm (### 4.1 API Chat Flow) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 438.00 Tm (The route `POST /api/v1/followthru/chat` calls `handle_followthru_chat`.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 412.00 Tm (That service:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 386.00 Tm (1. Normalizes and parses the request.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 373.00 Tm (2. Detects the mode: help, chat, preview, draft, or publish.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 360.00 Tm (3. Creates or loads a chat session.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 347.00 Tm (4. Stores the user message.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 334.00 Tm (5. Either:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 321.00 Tm (- generates a chat response, or) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 308.00 Tm (- runs extraction plus canvas workflow.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 295.00 Tm (6. Stores the assistant reply.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 282.00 Tm (7. Returns a structured `FollowThruResponse`.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 256.00 Tm (### 4.2 Voice Command Flow) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 230.00 Tm (The route `POST /api/v1/followthru/voice-command` is similar to chat, but it treats the) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 217.00 Tm (input as a speech-to-text transcript and can persist that source with `source_type=voice`.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 191.00 Tm (### 4.3 Workflow Preview Flow) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 165.00 Tm (The route `POST /api/v1/workflows/preview`:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 139.00 Tm (1. accepts raw meeting text,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 126.00 Tm (2. extracts structured intelligence,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 113.00 Tm (3. renders canvas markdown,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 100.00 Tm (4. returns the extraction plus draft markdown without storing a draft.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 74.00 Tm (This is useful for dry runs.) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 3250 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 48.00 744.00 Tm (### 4.4 Workflow Process Text Flow) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 718.00 Tm (The route `POST /api/v1/workflows/process-text`:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 692.00 Tm (1. stores the text as a source,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 679.00 Tm (2. extracts structured data,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 666.00 Tm (3. creates a draft record,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 653.00 Tm (4. optionally publishes the result to Slack.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 627.00 Tm (### 4.5 Slack Channel Slash Command Flow) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 601.00 Tm (The route `POST /slack/commands` forwards to Slack Bolt.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 575.00 Tm (The command handler supports channel usage like:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 549.00 Tm (- `/followthru`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 536.00 Tm (- `/followthru publish`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 523.00 Tm (- `/followthru help`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 510.00 Tm (- `/followthru process <zoom-link>`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 484.00 Tm (For channel preview/publish:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 458.00 Tm (1. FollowThru resolves the latest huddle notes canvas or transcript.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 445.00 Tm (2. It extracts structured meeting intelligence.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 432.00 Tm (3. It returns an ephemeral preview or publishes to the channel canvas.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 406.00 Tm (### 4.6 Slack DM Flow) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 380.00 Tm (In DMs, the bot can:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 354.00 Tm (- reply with help,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 341.00 Tm (- clear chat state,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 328.00 Tm (- stop active ingestion jobs,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 315.00 Tm (- accept pasted transcript text,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 302.00 Tm (- accept uploaded transcript files,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 289.00 Tm (- generate draft/preview/publish outputs.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 263.00 Tm (The DM handler is more flexible than the channel handler because it supports direct raw) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 250.00 Tm (content.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 224.00 Tm (### 4.7 Async Video Processing Flow) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 198.00 Tm (The new recording flow works like this:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 172.00 Tm (1. User runs `/followthru process <Zoom-recording-link>`.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 159.00 Tm (2. FollowThru opens a modal with extraction choices.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 146.00 Tm (3. User submits the modal.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 133.00 Tm (4. Slack interaction handler immediately acknowledges the modal.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 120.00 Tm (5. The handler posts a status message and enqueues `process_meeting_task`.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 107.00 Tm (6. Celery downloads the recording.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 94.00 Tm (7. FFmpeg extracts and chunks audio.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 81.00 Tm (8. Whisper transcribes the audio chunks in parallel.) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 13 0 R >>
+endobj
+15 0 obj
+<< /Length 2573 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 48.00 744.00 Tm (9. GPT-4o extracts only the user-selected fields using a dynamic schema.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 731.00 Tm (10. Canvas markdown is created and uploaded to Slack.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 718.00 Tm (11. A completion message is posted with the canvas ID.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 692.00 Tm (This is the most asynchronous and media-heavy workflow in the repo.) Tj ET
+BT /F2 14.00 Tf 1 0 0 1 48.00 666.00 Tm (5. What Each Important File Does) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 633.00 Tm (### `app/main.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 607.00 Tm (This is the application entry point.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 581.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 555.00 Tm (- initializes logging,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 542.00 Tm (- creates the FastAPI app,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 529.00 Tm (- adds middleware for request ID and processing time,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 516.00 Tm (- registers the routers.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 490.00 Tm (Why it matters:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 464.00 Tm (- it is the main composition root for the HTTP layer.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 438.00 Tm (### `app/config.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 412.00 Tm (This defines a Pydantic `Settings` class.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 386.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 360.00 Tm (- load environment variables,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 347.00 Tm (- normalize optional values,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 334.00 Tm (- provide defaults,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 321.00 Tm (- derive resolved values such as database URL and LLM model,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 308.00 Tm (- expose `redis_url` for the worker pipeline.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 282.00 Tm (Why it matters:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 256.00 Tm (- every integration and service reads config from here.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 230.00 Tm (### `app/logger.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 204.00 Tm (Simple logging bootstrap.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 178.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 152.00 Tm (- configure Python logging level and format,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 139.00 Tm (- expose `logger`.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 113.00 Tm (### `app/dependencies.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 87.00 Tm (Provides reusable FastAPI dependencies.) Tj ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 15 0 R >>
+endobj
+17 0 obj
+<< /Length 2367 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 48.00 744.00 Tm (Current role:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 718.00 Tm (- DB session dependency using `SessionLocal`.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 692.00 Tm (### `app/api/routes/health.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 666.00 Tm (Health endpoints:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 640.00 Tm (- `/`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 627.00 Tm (- `/health`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 614.00 Tm (- `/db-health`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 588.00 Tm (Purpose:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 562.00 Tm (- check if the app is alive,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 549.00 Tm (- check if database connectivity works,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 536.00 Tm (- expose basic runtime configuration state.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 510.00 Tm (### `app/api/routes/followthru.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 484.00 Tm (Public API surface for FollowThru features.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 458.00 Tm (Purpose:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 432.00 Tm (- expose capabilities,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 419.00 Tm (- expose chat,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 406.00 Tm (- expose voice-command transcript processing.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 380.00 Tm (### `app/api/routes/workflows.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 354.00 Tm (Direct non-Slack workflow endpoints.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 328.00 Tm (Purpose:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 302.00 Tm (- preview extracted output quickly,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 289.00 Tm (- process raw text into stored draft/canvas output.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 263.00 Tm (### `app/api/routes/slack_commands.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 237.00 Tm (Thin bridge from FastAPI to Slack Bolt for slash commands.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 211.00 Tm (### `app/api/routes/slack_interactions.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 185.00 Tm (Thin bridge from FastAPI to Slack Bolt for interactive events and modal submissions.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 159.00 Tm (### `app/db/base.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 133.00 Tm (Creates the SQLAlchemy engine and `Base`.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 107.00 Tm (Purpose:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 81.00 Tm (- central DB connectivity,) Tj ET
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 17 0 R >>
+endobj
+19 0 obj
+<< /Length 2208 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 60.00 744.00 Tm (- engine pooling config,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 731.00 Tm (- DB-type-specific options.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 705.00 Tm (### `app/db/session.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 679.00 Tm (Builds the SQLAlchemy session factory.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 653.00 Tm (Purpose:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 627.00 Tm (- every DB-using service relies on this.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 601.00 Tm (### `app/db/models/user.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 575.00 Tm (Stores a user identity.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 549.00 Tm (Key fields:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 523.00 Tm (- `id`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 510.00 Tm (- `slack_user_id`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 497.00 Tm (- `name`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 484.00 Tm (- `email`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 471.00 Tm (- `created_at`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 445.00 Tm (### `app/db/models/source.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 419.00 Tm (Stores raw input sources.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 393.00 Tm (Examples:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 367.00 Tm (- huddle notes,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 354.00 Tm (- transcript text,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 341.00 Tm (- voice transcript.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 315.00 Tm (Why important:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 289.00 Tm (- it preserves where a draft came from.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 263.00 Tm (### `app/db/models/draft.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 237.00 Tm (Stores metadata for a generated draft or published canvas.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 211.00 Tm (Key fields:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 185.00 Tm (- owner,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 172.00 Tm (- source,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 159.00 Tm (- Slack canvas ID,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 146.00 Tm (- title,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 133.00 Tm (- status,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 120.00 Tm (- timestamps.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 94.00 Tm (### `app/db/models/extracted_item.py`) Tj ET
+endstream
+endobj
+20 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 19 0 R >>
+endobj
+21 0 obj
+<< /Length 2445 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 48.00 744.00 Tm (Stores normalized extracted items linked to a draft.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 718.00 Tm (Examples:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 692.00 Tm (- summary,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 679.00 Tm (- decision,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 666.00 Tm (- action item,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 653.00 Tm (- blocker,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 640.00 Tm (- due date,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 627.00 Tm (- question.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 601.00 Tm (### `app/db/models/chat_session.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 575.00 Tm (Stores a logical FollowThru conversation.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 549.00 Tm (Useful for:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 523.00 Tm (- context continuity,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 510.00 Tm (- history persistence,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 497.00 Tm (- multi-turn chat.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 471.00 Tm (### `app/db/models/chat_message.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 445.00 Tm (Stores each message in a chat session.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 419.00 Tm (Roles:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 393.00 Tm (- system,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 380.00 Tm (- user,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 367.00 Tm (- assistant.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 341.00 Tm (### `app/domain/schemas/extraction.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 315.00 Tm (Defines the structured extraction contract.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 289.00 Tm (Important because:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 263.00 Tm (- it standardizes the format expected by canvas generation and draft persistence.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 237.00 Tm (### `app/domain/schemas/followthru.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 211.00 Tm (Defines request and response types for chat and voice-command flows.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 185.00 Tm (### `app/domain/schemas/workflow.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 159.00 Tm (Defines request and response models for the direct preview/process-text API routes.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 133.00 Tm (### `app/domain/services/extraction_service.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 107.00 Tm (This is the core structured extraction engine for sync note-based workflows.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 81.00 Tm (Responsibilities:) Tj ET
+endstream
+endobj
+22 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 21 0 R >>
+endobj
+23 0 obj
+<< /Length 2915 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 60.00 744.00 Tm (- normalize input,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 731.00 Tm (- compress overly large transcripts,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 718.00 Tm (- call LLM extraction when configured,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 705.00 Tm (- otherwise fall back to deterministic rule-based parsing.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 679.00 Tm (Why the fallback exists:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 653.00 Tm (- it allows the app to remain useful even without an LLM key.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 627.00 Tm (### `app/domain/services/followthru_service.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 601.00 Tm (This is the main orchestration brain for the synchronous FollowThru product behavior.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 575.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 549.00 Tm (- parse user intent,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 536.00 Tm (- decide mode,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 523.00 Tm (- manage sessions and chat history,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 510.00 Tm (- resolve sources,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 497.00 Tm (- run extraction,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 484.00 Tm (- call draft creation,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 471.00 Tm (- generate final `FollowThruResponse`.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 445.00 Tm (This is one of the most important files in the repo.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 419.00 Tm (### `app/domain/services/draft_service.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 393.00 Tm (Takes extraction output and converts it into persisted draft state plus optional Slack) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 380.00 Tm (publication.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 354.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 328.00 Tm (- build canvas title,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 315.00 Tm (- generate canvas markdown,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 302.00 Tm (- optionally upload to Slack,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 289.00 Tm (- insert `Draft`,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 276.00 Tm (- insert `ExtractedItem` rows.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 250.00 Tm (### `app/domain/services/canvas_composer.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 224.00 Tm (Responsible for converting structured extraction output into Slack Canvas markdown.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 198.00 Tm (It now supports two output styles:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 172.00 Tm (- fixed schema canvas from `ExtractionResult`,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 159.00 Tm (- dynamic schema canvas from the new async video pipeline.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 133.00 Tm (### `app/domain/services/parallel_whisper.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 107.00 Tm (Async transcription layer for audio chunks.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 81.00 Tm (Responsibilities:) Tj ET
+endstream
+endobj
+24 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 23 0 R >>
+endobj
+25 0 obj
+<< /Length 2737 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 60.00 744.00 Tm (- call `AsyncOpenAI`,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 731.00 Tm (- send chunk transcriptions in parallel,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 718.00 Tm (- include the Hinglish prompt,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 705.00 Tm (- pass tail context between chunks to reduce boundary hallucination,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 692.00 Tm (- reassemble the transcript in order.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 666.00 Tm (### `app/domain/services/dynamic_extraction.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 640.00 Tm (Dynamic GPT-4o extraction layer for the async recording flow.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 614.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 588.00 Tm (- build a Pydantic response model at runtime from user-selected fields,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 575.00 Tm (- call GPT-4o,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 562.00 Tm (- return only the sections requested in the Slack modal.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 536.00 Tm (Why this matters:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 510.00 Tm (- the extraction contract is no longer fixed.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 484.00 Tm (### `app/integrations/openai_client.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 458.00 Tm (Current synchronous OpenAI-compatible integration.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 432.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 406.00 Tm (- extract structured meeting data,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 393.00 Tm (- generate general FollowThru chat replies.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 367.00 Tm (Why the app uses an ?OpenAI-compatible? wrapper:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 341.00 Tm (- it can work with OpenAI-compatible providers, not just one vendor.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 315.00 Tm (### `app/integrations/slack_client.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 289.00 Tm (Central wrapper around Slack Web API operations.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 263.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 237.00 Tm (- message update/delete,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 224.00 Tm (- file list/info/download/upload,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 211.00 Tm (- canvas create/edit/delete,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 198.00 Tm (- channel history lookup.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 172.00 Tm (Why a wrapper is useful:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 146.00 Tm (- keeps Slack SDK code in one place,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 133.00 Tm (- makes handlers simpler,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 120.00 Tm (- improves testability.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 94.00 Tm (### `app/slack/bolt_app.py`) Tj ET
+endstream
+endobj
+26 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 25 0 R >>
+endobj
+27 0 obj
+<< /Length 2645 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 48.00 744.00 Tm (Bootstrap for Slack Bolt.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 718.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 692.00 Tm (- initialize Bolt app only when Slack is configured,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 679.00 Tm (- register command listeners,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 666.00 Tm (- register interaction listeners,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 653.00 Tm (- expose `handle_slack_request`.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 627.00 Tm (### `app/slack/handlers/commands.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 601.00 Tm (This is the main Slack behavior file.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 575.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 549.00 Tm (- slash command handling,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 536.00 Tm (- app mention handling,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 523.00 Tm (- DM handling,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 510.00 Tm (- DM file parsing,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 497.00 Tm (- clear/stop flows,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 484.00 Tm (- opening the async processing modal.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 458.00 Tm (This file is large because it owns several Slack-facing user journeys.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 432.00 Tm (### `app/slack/handlers/interactions.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 406.00 Tm (Handles modal submission for the async recording pipeline.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 380.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 354.00 Tm (- `ack\(\)` the modal,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 341.00 Tm (- read selected checkboxes and custom focus,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 328.00 Tm (- post immediate status to Slack,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 315.00 Tm (- enqueue the Celery task.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 289.00 Tm (### `app/slack/views/canvas_modal.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 263.00 Tm (Builds the Slack modal JSON.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 237.00 Tm (Purpose:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 211.00 Tm (- keep UI shape separate from handler logic.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 185.00 Tm (### `app/slack/services/source_resolver.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 159.00 Tm (This service knows how to find the best Slack source content.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 133.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 107.00 Tm (- inspect channel files,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 94.00 Tm (- find canvases,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 81.00 Tm (- find transcript candidates,) Tj ET
+endstream
+endobj
+28 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 27 0 R >>
+endobj
+29 0 obj
+<< /Length 2915 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 60.00 744.00 Tm (- score likely transcript files,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 731.00 Tm (- fetch canvas/transcript content,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 718.00 Tm (- persist a `Source`.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 692.00 Tm (This is important because Slack channels do not always contain one neat canonical source.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 666.00 Tm (### `app/slack/services/dm_ingestion_service.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 640.00 Tm (This appears to be an ingestion-oriented DM service path intended for job-based) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 627.00 Tm (processing.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 601.00 Tm (Important note:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 575.00 Tm (- in the current workspace, this file references ingestion modules that are not) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 562.00 Tm (present in `app/domain/schemas` and `app/domain/services`.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 549.00 Tm (- that means it looks like partial or future-facing scaffolding rather than the) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 536.00 Tm (currently active primary path.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 510.00 Tm (### `app/workers/celery_app.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 484.00 Tm (Defines the Celery worker app.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 458.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 432.00 Tm (- broker/backend configuration using Redis,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 419.00 Tm (- JSON task serialization,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 406.00 Tm (- worker cleanup hooks,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 393.00 Tm (- SQLAlchemy engine disposal after tasks.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 367.00 Tm (### `app/workers/media_processor.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 341.00 Tm (Runs FFmpeg.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 315.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 289.00 Tm (- extract audio from media,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 276.00 Tm (- convert to mono 16kHz MP3,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 263.00 Tm (- segment into 10-minute chunks.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 237.00 Tm (### `app/workers/tasks.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 211.00 Tm (Main async background task orchestration.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 185.00 Tm (Responsibilities:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 159.00 Tm (- download media,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 146.00 Tm (- call FFmpeg chunking,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 133.00 Tm (- call parallel Whisper transcription,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 120.00 Tm (- call dynamic GPT-4o extraction,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 107.00 Tm (- build markdown,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 94.00 Tm (- upload canvas to Slack,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 81.00 Tm (- notify success or failure,) Tj ET
+endstream
+endobj
+30 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 29 0 R >>
+endobj
+31 0 obj
+<< /Length 2589 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 60.00 744.00 Tm (- clean temporary files.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 718.00 Tm (### `scripts/dev.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 692.00 Tm (Convenience script for local development.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 666.00 Tm (Purpose:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 640.00 Tm (- starts Uvicorn with reload enabled.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 614.00 Tm (### `scripts/seed.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 588.00 Tm (Prints a sample meeting note payload for ad hoc testing.) Tj ET
+BT /F2 14.00 Tf 1 0 0 1 48.00 562.00 Tm (6. Database Model Relationships) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 529.00 Tm (The core persisted relationships are:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 503.00 Tm (- one `User` can create many `Source` records,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 490.00 Tm (- one `User` can own many `ChatSession` records,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 477.00 Tm (- one `ChatSession` can contain many `ChatMessage` records,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 464.00 Tm (- one `Source` can produce many `Draft` records,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 451.00 Tm (- one `Draft` can contain many `ExtractedItem` records.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 425.00 Tm (This structure is useful because it cleanly separates:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 399.00 Tm (- raw input from generated output,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 386.00 Tm (- chat memory from workflow drafts,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 373.00 Tm (- persisted entity rows from rendered canvas content.) Tj ET
+BT /F2 14.00 Tf 1 0 0 1 48.00 347.00 Tm (7. Full Tech Stack And Why It Is Used) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 314.00 Tm (### FastAPI) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 288.00 Tm (Used for:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 262.00 Tm (- HTTP APIs,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 249.00 Tm (- Slack endpoints,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 236.00 Tm (- health checks,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 223.00 Tm (- JSON request/response handling.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 197.00 Tm (Why this stack choice is good:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 171.00 Tm (- easy Pydantic integration,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 158.00 Tm (- strong typing,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 145.00 Tm (- fast development speed,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 132.00 Tm (- lightweight and good for API-first backends.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 106.00 Tm (### Slack Bolt + Slack SDK) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 80.00 Tm (Used for:) Tj ET
+endstream
+endobj
+32 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 31 0 R >>
+endobj
+33 0 obj
+<< /Length 2439 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 60.00 744.00 Tm (- slash commands,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 731.00 Tm (- app mentions,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 718.00 Tm (- modal handling,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 705.00 Tm (- event handling,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 692.00 Tm (- Slack Web API access.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 666.00 Tm (Why:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 640.00 Tm (- Slack Bolt is the standard event/listener framework for Slack apps.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 627.00 Tm (- Slack SDK provides the lower-level Web API methods needed for canvases, files, and) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 614.00 Tm (messaging.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 588.00 Tm (### Pydantic) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 562.00 Tm (Used for:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 536.00 Tm (- app config,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 523.00 Tm (- request/response schemas,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 510.00 Tm (- extracted intelligence schemas,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 497.00 Tm (- dynamic schema generation.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 471.00 Tm (Why:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 445.00 Tm (- runtime validation,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 432.00 Tm (- clean type hints,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 419.00 Tm (- easy serialization/deserialization,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 406.00 Tm (- perfect fit with FastAPI.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 380.00 Tm (### SQLAlchemy) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 354.00 Tm (Used for:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 328.00 Tm (- ORM models,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 315.00 Tm (- database sessions,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 302.00 Tm (- persistence logic.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 276.00 Tm (Why:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 250.00 Tm (- mature Python ORM,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 237.00 Tm (- works well with PostgreSQL and SQLite,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 224.00 Tm (- flexible enough for both simple and evolving schemas.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 198.00 Tm (### Alembic) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 172.00 Tm (Used for:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 146.00 Tm (- schema migrations.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 120.00 Tm (Why:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 94.00 Tm (- standard migration tool for SQLAlchemy projects.) Tj ET
+endstream
+endobj
+34 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 33 0 R >>
+endobj
+35 0 obj
+<< /Length 2469 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 48.00 744.00 Tm (### PostgreSQL) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 718.00 Tm (Used for:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 692.00 Tm (- primary relational persistence in production/local Docker flow.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 666.00 Tm (Why:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 640.00 Tm (- reliable transactional database,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 627.00 Tm (- better production fit than SQLite for multi-user workflow state,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 614.00 Tm (- good support for structured app data.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 588.00 Tm (### Redis) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 562.00 Tm (Used for:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 536.00 Tm (- Celery broker,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 523.00 Tm (- Celery result backend.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 497.00 Tm (Why:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 471.00 Tm (- fast in-memory queue backend,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 458.00 Tm (- common and proven Celery pairing,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 445.00 Tm (- good enough for transient job coordination.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 419.00 Tm (### Celery) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 393.00 Tm (Used for:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 367.00 Tm (- background task execution for long-running video-processing jobs.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 341.00 Tm (Why:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 315.00 Tm (- the recording workflow is too slow for a synchronous Slack request cycle,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 302.00 Tm (- Celery is a standard Python background job framework,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 289.00 Tm (- Redis + Celery is a familiar and maintainable async processing stack.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 263.00 Tm (### FFmpeg) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 237.00 Tm (Used for:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 211.00 Tm (- audio extraction from recordings,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 198.00 Tm (- audio normalization,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 185.00 Tm (- chunking audio into 10-minute MP3 segments.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 159.00 Tm (Why:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 133.00 Tm (- industry-standard media processing tool,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 120.00 Tm (- very reliable for format conversion and segmentation.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 94.00 Tm (### OpenAI / OpenAI-Compatible APIs) Tj ET
+endstream
+endobj
+36 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 35 0 R >>
+endobj
+37 0 obj
+<< /Length 2410 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 48.00 744.00 Tm (Used for:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 718.00 Tm (- synchronous structured extraction,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 705.00 Tm (- FollowThru chat responses,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 692.00 Tm (- Whisper transcription in the async media workflow,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 679.00 Tm (- GPT-4o dynamic extraction.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 653.00 Tm (Why:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 627.00 Tm (- LLMs are strong at semantic extraction,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 614.00 Tm (- Whisper is strong at transcription,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 601.00 Tm (- GPT-4o is strong at structured intelligence extraction from transcripts.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 575.00 Tm (### httpx) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 549.00 Tm (Used for:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 523.00 Tm (- calling external HTTP APIs,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 510.00 Tm (- downloading remote files,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 497.00 Tm (- posting chat-completions requests.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 471.00 Tm (Why:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 445.00 Tm (- modern Python HTTP client,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 432.00 Tm (- clean sync and async support.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 406.00 Tm (### aiofiles) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 380.00 Tm (Used for:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 354.00 Tm (- async file reads in the parallel Whisper pipeline.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 328.00 Tm (Why:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 302.00 Tm (- allows non-blocking file access inside async transcription tasks.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 276.00 Tm (### pytest) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 250.00 Tm (Used for:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 224.00 Tm (- unit test suite.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 198.00 Tm (Why:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 172.00 Tm (- standard Python testing framework,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 159.00 Tm (- readable and flexible tests.) Tj ET
+BT /F2 14.00 Tf 1 0 0 1 48.00 133.00 Tm (8. Why This Particular Overall Stack Makes Sense) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 100.00 Tm (This project is fundamentally an integration-heavy workflow backend.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 74.00 Tm (The stack fits that kind of product because:) Tj ET
+endstream
+endobj
+38 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 37 0 R >>
+endobj
+39 0 obj
+<< /Length 3228 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 60.00 744.00 Tm (- FastAPI + Pydantic are excellent for typed APIs.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 731.00 Tm (- Slack Bolt is the natural tool for Slack interactivity.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 718.00 Tm (- SQLAlchemy + PostgreSQL handle durable workflow state well.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 705.00 Tm (- Celery + Redis handle slow background work cleanly.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 692.00 Tm (- FFmpeg solves media preprocessing without reinventing media tooling.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 679.00 Tm (- OpenAI APIs solve the hard semantic/transcription tasks.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 653.00 Tm (In other words:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 627.00 Tm (- relational DB for durable state,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 614.00 Tm (- queue for long-running work,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 601.00 Tm (- specialized media tool for audio preprocessing,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 588.00 Tm (- LLMs for unstructured language understanding,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 575.00 Tm (- Slack SDK/Bolt for the product surface,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 562.00 Tm (- FastAPI as the glue.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 536.00 Tm (That is why this stack is practical rather than trendy.) Tj ET
+BT /F2 14.00 Tf 1 0 0 1 48.00 510.00 Tm (9. Request Lifecycle Summary) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 477.00 Tm (### Sync notes-based workflow) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 451.00 Tm (- user provides text,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 438.00 Tm (- system extracts structure,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 425.00 Tm (- system creates markdown,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 412.00 Tm (- system stores draft,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 399.00 Tm (- optionally system publishes to Slack.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 373.00 Tm (### Sync chat workflow) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 347.00 Tm (- user asks FollowThru something,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 334.00 Tm (- system loads recent history,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 321.00 Tm (- system either replies with LLM chat or deterministic fallback,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 308.00 Tm (- system persists the exchange.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 282.00 Tm (### Async recording workflow) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 256.00 Tm (- user provides recording link,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 243.00 Tm (- user chooses desired outputs,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 230.00 Tm (- system enqueues background job,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 217.00 Tm (- worker downloads and processes media,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 204.00 Tm (- worker transcribes audio,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 191.00 Tm (- worker extracts structured output,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 178.00 Tm (- worker publishes canvas,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 165.00 Tm (- worker posts completion message.) Tj ET
+BT /F2 14.00 Tf 1 0 0 1 48.00 139.00 Tm (10. Testing Strategy) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 106.00 Tm (The repo mainly uses unit tests.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 80.00 Tm (The tests cover:) Tj ET
+endstream
+endobj
+40 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 39 0 R >>
+endobj
+41 0 obj
+<< /Length 3635 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 60.00 744.00 Tm (- route correctness,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 731.00 Tm (- settings behavior,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 718.00 Tm (- extraction logic,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 705.00 Tm (- canvas composition,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 692.00 Tm (- Slack command behavior,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 679.00 Tm (- source resolution,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 666.00 Tm (- ingestion service behavior.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 640.00 Tm (This is useful because the product has many branches of orchestration logic and many) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 627.00 Tm (external integrations that are easier to mock than to run end-to-end in every test.) Tj ET
+BT /F2 14.00 Tf 1 0 0 1 48.00 601.00 Tm (11. Important Strengths Of This Codebase) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 568.00 Tm (- clear separation between API, domain, integrations, DB, and Slack surfaces,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 555.00 Tm (- typed schemas throughout,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 542.00 Tm (- deterministic fallback when LLM is unavailable,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 529.00 Tm (- durable storage of chat and workflow state,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 516.00 Tm (- async recording pipeline now separated from request-response logic,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 503.00 Tm (- reusable Slack wrapper and OpenAI wrapper,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 490.00 Tm (- existing unit test coverage for major sync flows.) Tj ET
+BT /F2 14.00 Tf 1 0 0 1 48.00 464.00 Tm (12. Important Caveats) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 431.00 Tm (- some docs in the repo describe alternate or older ingestion/transcription setups,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 418.00 Tm (so the code should be treated as the source of truth.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 405.00 Tm (- `app/slack/services/dm_ingestion_service.py` references ingestion modules not) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 392.00 Tm (currently present in the visible workspace, so that path looks incomplete or staged) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 379.00 Tm (for future work.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 366.00 Tm (- the current worker pipeline depends on external runtime software:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 353.00 Tm (- Redis server,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 340.00 Tm (- FFmpeg,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 327.00 Tm (- database,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 314.00 Tm (- Slack credentials,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 301.00 Tm (- OpenAI API key.) Tj ET
+BT /F2 14.00 Tf 1 0 0 1 48.00 275.00 Tm (13. What To Learn First If You Are New) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 242.00 Tm (If you want to understand the project quickly, read in this order:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 216.00 Tm (1. `README.md`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 203.00 Tm (2. `app/main.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 190.00 Tm (3. `app/config.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 177.00 Tm (4. `app/domain/services/followthru_service.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 164.00 Tm (5. `app/domain/services/extraction_service.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 151.00 Tm (6. `app/domain/services/draft_service.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 138.00 Tm (7. `app/domain/services/canvas_composer.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 125.00 Tm (8. `app/slack/handlers/commands.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 112.00 Tm (9. `app/slack/services/source_resolver.py`) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 99.00 Tm (10. `app/workers/tasks.py`) Tj ET
+endstream
+endobj
+42 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 41 0 R >>
+endobj
+43 0 obj
+<< /Length 1381 >>
+stream
+BT /F1 10.00 Tf 1 0 0 1 48.00 744.00 Tm (That reading order gives you:) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 718.00 Tm (- entry point,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 705.00 Tm (- config,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 692.00 Tm (- main orchestration,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 679.00 Tm (- extraction,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 666.00 Tm (- draft persistence,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 653.00 Tm (- canvas generation,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 640.00 Tm (- Slack behavior,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 627.00 Tm (- source resolution,) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 60.00 614.00 Tm (- background media flow.) Tj ET
+BT /F2 14.00 Tf 1 0 0 1 48.00 588.00 Tm (14. Short Plain-English Summary) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 555.00 Tm (FollowThru is an execution intelligence backend.) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 529.00 Tm (It listens to Slack and API inputs, turns raw meeting content into structured) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 516.00 Tm (deliverables, stores the workflow state in PostgreSQL, and publishes the result as Slack) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 503.00 Tm (canvases. The synchronous path handles notes, chat, and transcript text. The asynchronous) Tj ET
+BT /F1 10.00 Tf 1 0 0 1 48.00 490.00 Tm (path handles recording links using Redis, Celery, FFmpeg, Whisper, and GPT-4o.) Tj ET
+endstream
+endobj
+44 0 obj
+<< /Type /Page /Parent 1 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R /F2 3 0 R /F3 4 0 R >> >> /Contents 43 0 R >>
+endobj
+45 0 obj
+<< /Type /Catalog /Pages 1 0 R >>
+endobj
+xref
+0 46
+0000000000 65535 f 
+0000000015 00000 n 
+0000000205 00000 n 
+0000000275 00000 n 
+0000000350 00000 n 
+0000000418 00000 n 
+0000003750 00000 n 
+0000003896 00000 n 
+0000007527 00000 n 
+0000007673 00000 n 
+0000011255 00000 n 
+0000011402 00000 n 
+0000014540 00000 n 
+0000014688 00000 n 
+0000017991 00000 n 
+0000018139 00000 n 
+0000020765 00000 n 
+0000020913 00000 n 
+0000023333 00000 n 
+0000023481 00000 n 
+0000025742 00000 n 
+0000025890 00000 n 
+0000028388 00000 n 
+0000028536 00000 n 
+0000031504 00000 n 
+0000031652 00000 n 
+0000034442 00000 n 
+0000034590 00000 n 
+0000037288 00000 n 
+0000037436 00000 n 
+0000040404 00000 n 
+0000040552 00000 n 
+0000043194 00000 n 
+0000043342 00000 n 
+0000045834 00000 n 
+0000045982 00000 n 
+0000048504 00000 n 
+0000048652 00000 n 
+0000051115 00000 n 
+0000051263 00000 n 
+0000054544 00000 n 
+0000054692 00000 n 
+0000058380 00000 n 
+0000058528 00000 n 
+0000059962 00000 n 
+0000060110 00000 n 
+trailer
+<< /Size 46 /Root 45 0 R >>
+startxref
+60160
+%%EOF

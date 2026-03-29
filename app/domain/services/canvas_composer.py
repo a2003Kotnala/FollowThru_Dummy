@@ -32,6 +32,66 @@ def create_draft_canvas(
     ) + "\n"
 
 
+def create_dynamic_canvas(
+    extraction: dict[str, object],
+    selected_options: list[str] | None = None,
+    custom_focus_prompt: str | None = None,
+    source_label: str = "zoom_recording",
+) -> str:
+    selected_labels = _selected_output_label_text(
+        selected_options=selected_options,
+        custom_focus_prompt=custom_focus_prompt,
+    )
+    title = str(extraction.get("meeting_title") or "").strip()
+    if not title:
+        title = f"Meeting - {datetime.now().strftime('%Y-%m-%d')}"
+
+    sections = [
+        "\n".join(
+            [
+                header(title),
+                f":calendar: {bold('Date:')} {datetime.now().strftime('%d %b %Y')}",
+                f":mag: {bold('Requested outputs:')} {selected_labels}",
+            ]
+        )
+    ]
+
+    executive_summary = _coerce_text(extraction.get("executive_summary"))
+    if executive_summary:
+        sections.append(_build_dynamic_text_section("Executive Summary", executive_summary))
+
+    decisions = _coerce_insight_items(extraction.get("key_decisions"))
+    if decisions:
+        sections.append(build_decisions_section(decisions))
+
+    action_items = _coerce_action_items(extraction.get("action_items"))
+    if action_items:
+        sections.append(build_action_items_section(action_items))
+
+    risks = _coerce_insight_items(extraction.get("risks"))
+    if risks:
+        sections.append(build_risks_section(risks))
+
+    custom_focus_analysis = _coerce_text(extraction.get("custom_focus_analysis"))
+    if custom_focus_analysis:
+        sections.append(
+            _build_custom_focus_section(custom_focus_prompt, custom_focus_analysis)
+        )
+
+    if len(sections) == 1:
+        sections.append(
+            _build_dynamic_text_section(
+                "Executive Summary",
+                "No structured meeting insights were extracted from the recording.",
+            )
+        )
+
+    sections.append(build_footer(source_label))
+    return f"\n\n{divider()}\n\n".join(
+        section for section in sections if section.strip()
+    ) + "\n"
+
+
 def divider() -> str:
     return "---"
 
@@ -171,8 +231,86 @@ def build_footer(source_label: str) -> str:
     )
 
 
+def _build_dynamic_text_section(title: str, text: str) -> str:
+    lines = [header(title, 2), ""]
+    lines.extend(f"- {item}" for item in _summary_bullets(text))
+    return "\n".join(lines)
+
+
+def _build_custom_focus_section(prompt: str | None, analysis: str) -> str:
+    lines = [header("Custom Focus", 2), ""]
+    if prompt:
+        lines.append(f"{italic('Prompt:')} {prompt}")
+        lines.append("")
+    lines.extend(f"- {item}" for item in _summary_bullets(analysis))
+    return "\n".join(lines)
+
+
 def _escape_cell(value: str) -> str:
     return value.replace("\n", "<br>").replace("|", "\\|")
+
+
+def _coerce_text(value: object) -> str:
+    if isinstance(value, str):
+        return value.strip()
+    return ""
+
+
+def _coerce_insight_items(value: object) -> list[InsightItem]:
+    if not isinstance(value, list):
+        return []
+
+    items: list[InsightItem] = []
+    for entry in value:
+        if isinstance(entry, InsightItem):
+            items.append(entry)
+            continue
+        if isinstance(entry, dict):
+            try:
+                items.append(InsightItem.model_validate(entry))
+            except Exception:
+                continue
+    return items
+
+
+def _coerce_action_items(value: object) -> list[ActionItem]:
+    if not isinstance(value, list):
+        return []
+
+    items: list[ActionItem] = []
+    for entry in value:
+        if isinstance(entry, ActionItem):
+            items.append(entry)
+            continue
+        if isinstance(entry, dict):
+            try:
+                items.append(ActionItem.model_validate(entry))
+            except Exception:
+                continue
+    return items
+
+
+def _selected_option_label(option: str) -> str:
+    return {
+        "executive_summary": "Executive Summary",
+        "action_items": "Action Items",
+        "key_decisions": "Key Decisions",
+        "risks": "Risks",
+    }.get(option, option.replace("_", " ").title())
+
+
+def _selected_output_label_text(
+    selected_options: list[str] | None,
+    custom_focus_prompt: str | None,
+) -> str:
+    labels = [
+        _selected_option_label(option)
+        for option in (selected_options or [])
+        if str(option).strip()
+    ]
+    if custom_focus_prompt:
+        labels.append("Custom Focus")
+    return ", ".join(labels) if labels else "Executive Summary"
 
 
 def _owner_label(item: ActionItem) -> str:

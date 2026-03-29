@@ -1,3 +1,4 @@
+import json
 from io import BytesIO
 from types import SimpleNamespace
 from uuid import uuid4
@@ -18,6 +19,7 @@ class FakeBoltApp:
     def __init__(self) -> None:
         self.command_handlers = {}
         self.event_handlers = {}
+        self.view_handlers = {}
 
     def command(self, name: str):
         def decorator(func):
@@ -29,6 +31,13 @@ class FakeBoltApp:
     def event(self, name: str):
         def decorator(func):
             self.event_handlers[name] = func
+            return func
+
+        return decorator
+
+    def view(self, name: str):
+        def decorator(func):
+            self.view_handlers[name] = func
             return func
 
         return decorator
@@ -230,6 +239,8 @@ def test_followthru_help_command_returns_usage():
                 "- `/followthru` previews the latest huddle notes for this channel.\n"
                 "- `/followthru publish` publishes the latest huddle notes "
                 "to the channel canvas.\n"
+                "- `/followthru process <Zoom recording link>` opens a modal "
+                "so you can choose what the video pipeline should extract.\n"
                 "In DMs:\n"
                 "- `/followthru clear` clears FollowThru chat state in this DM "
                 "and removes recent bot chat messages.\n"
@@ -239,6 +250,61 @@ def test_followthru_help_command_returns_usage():
                 "transcript file for larger Zoom, Meet, or Slack huddles.\n"
                 "FollowThru keeps command output private to the person who runs it."
             ),
+            "response_type": "ephemeral",
+        }
+    ]
+
+
+def test_followthru_process_command_opens_canvas_configuration_modal(monkeypatch):
+    app = FakeBoltApp()
+    register_handlers(app)
+
+    opened_views: list[dict] = []
+    monkeypatch.setattr(
+        "app.slack.handlers.commands.slack_client.client.views_open",
+        lambda **kwargs: opened_views.append(kwargs),
+    )
+
+    responses: list[dict] = []
+    app.command_handlers["/followthru"](
+        ack=lambda: None,
+        command={
+            "channel_id": "C123",
+            "user_id": "U123",
+            "trigger_id": "trigger-123",
+            "text": "process https://zoom.example.com/recording.mp4",
+        },
+        respond=lambda **kwargs: responses.append(kwargs),
+    )
+
+    assert responses == []
+    assert opened_views[0]["trigger_id"] == "trigger-123"
+    assert opened_views[0]["view"]["callback_id"] == "canvas_config_modal"
+    assert json.loads(opened_views[0]["view"]["private_metadata"]) == {
+        "channel_id": "C123",
+        "text_input": "https://zoom.example.com/recording.mp4",
+    }
+
+
+def test_followthru_process_command_requires_zoom_link():
+    app = FakeBoltApp()
+    register_handlers(app)
+
+    responses: list[dict] = []
+    app.command_handlers["/followthru"](
+        ack=lambda: None,
+        command={
+            "channel_id": "C123",
+            "user_id": "U123",
+            "trigger_id": "trigger-123",
+            "text": "process",
+        },
+        respond=lambda **kwargs: responses.append(kwargs),
+    )
+
+    assert responses == [
+        {
+            "text": "Please provide a Zoom recording link after `/followthru process`.",
             "response_type": "ephemeral",
         }
     ]

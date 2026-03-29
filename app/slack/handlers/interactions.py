@@ -57,10 +57,13 @@ def _parse_private_metadata(body: dict) -> dict[str, str]:
     parsed = json.loads(metadata)
     if not isinstance(parsed, dict):
         raise ValueError("Modal private_metadata must be a JSON object.")
-    return {
+    payload = {
         "channel_id": str(parsed.get("channel_id") or "").strip(),
         "text_input": str(parsed.get("text_input") or "").strip(),
     }
+    if not payload["channel_id"] or not payload["text_input"]:
+        raise ValueError("Modal private_metadata is missing channel_id or text_input.")
+    return payload
 
 
 def _extract_selected_options(body: dict) -> list[str]:

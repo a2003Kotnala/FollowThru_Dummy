@@ -29,8 +29,10 @@ def get_bolt_app() -> App:
             signing_secret=settings.slack_signing_secret,
         )
         from app.slack.handlers.commands import register_handlers
+        from app.slack.handlers.interactions import register_interactions
 
         register_handlers(_bolt_app)
+        register_interactions(_bolt_app)
         _bolt_handler = SlackRequestHandler(_bolt_app)
         return _bolt_app
     except BoltError as exc:

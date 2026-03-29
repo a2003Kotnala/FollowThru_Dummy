@@ -87,6 +87,7 @@ class Settings(BaseSettings):
     primary_slack_command: str = "/followthru"
     legacy_slack_command: str = "/zmanage"
     followthru_chat_history_limit: int = 12
+    redis_url: str = Field(default="redis://localhost:6379/0")
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

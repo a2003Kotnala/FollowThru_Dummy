@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
+from types import SimpleNamespace
 from xml.etree import ElementTree
 from zipfile import BadZipFile, ZipFile
 
@@ -22,6 +23,13 @@ from app.logger import logger
 from app.slack.services.source_resolver import (
     resolve_latest_huddle_notes_canvas,
 )
+from app.slack.views.canvas_modal import build_canvas_configuration_modal
+
+try:
+    from app.domain.services.ingestion_job_service import request_job_stop
+except Exception:  # pragma: no cover - optional until ingestion service is available
+    def request_job_stop(_channel_id: str):
+        return SimpleNamespace(stopped=False, active=False)
 
 HELP_TEXT = (
     "*FollowThru command guide*\n"
@@ -29,6 +37,8 @@ HELP_TEXT = (
     "- `/followthru` previews the latest huddle notes for this channel.\n"
     "- `/followthru publish` publishes the latest huddle notes "
     "to the channel canvas.\n"
+    "- `/followthru process <Zoom recording link>` opens a modal so you can "
+    "choose what the video pipeline should extract.\n"
     "In DMs:\n"
     "- `/followthru clear` clears FollowThru chat state in this DM and removes "
     "recent bot chat messages.\n"
@@ -63,6 +73,13 @@ DM_HELP_TEXT = (
 )
 DM_CLEAR_CHANNEL_MESSAGE = (
     "`/followthru clear` only works in a DM with FollowThru."
+)
+DM_STOP_CHANNEL_MESSAGE = "`/followthru stop` only works in a DM with FollowThru."
+PROCESS_MISSING_LINK_MESSAGE = (
+    "Please provide a Zoom recording link after `/followthru process`."
+)
+PROCESS_MODAL_FAILURE_MESSAGE = (
+    "I couldn't open the processing modal right now. Please try again."
 )
 
 DM_PREVIEW_FOOTER = (
@@ -144,15 +161,62 @@ def register_handlers(bolt_app) -> None:
                 _respond_privately(respond, DM_CLEAR_CHANNEL_MESSAGE)
                 return
 
-            clear_followthru_dm_session(channel_id)
-            removed_bot_messages =_clear_dm_bot_messages(channel_id)
-            # _respond_privately(
-            #     respond,
-            #     _build_dm_clear_message(
-            #         clear_result,
-            #         removed_bot_messages,
-            #     ),
-            # )
+            clear_result = clear_followthru_dm_session(channel_id)
+            removed_bot_messages = _clear_dm_bot_messages(channel_id)
+            _respond_privately(
+                respond,
+                _build_dm_clear_message(
+                    clear_result,
+                    removed_bot_messages,
+                ),
+            )
+            return
+
+        if mode == "stop":
+            if not is_dm:
+                _respond_privately(respond, DM_STOP_CHANNEL_MESSAGE)
+                return
+
+            stop_result = request_job_stop(channel_id)
+            if stop_result.stopped:
+                _respond_privately(
+                    respond,
+                    (
+                        "Stop requested. FollowThru will halt the current "
+                        "meeting job shortly."
+                        if stop_result.active
+                        else "FollowThru stopped the queued meeting job for this DM."
+                    ),
+                )
+            else:
+                _respond_privately(
+                    respond,
+                    "There is no active FollowThru job to stop in this DM.",
+                )
+            return
+
+        if mode == "process":
+            if not text:
+                _respond_privately(respond, PROCESS_MISSING_LINK_MESSAGE)
+                return
+
+            trigger_id = command.get("trigger_id")
+            if not trigger_id:
+                _respond_privately(respond, PROCESS_MODAL_FAILURE_MESSAGE)
+                return
+
+            try:
+                slack_client.client.views_open(
+                    trigger_id=trigger_id,
+                    view=build_canvas_configuration_modal(
+                        channel_id=channel_id,
+                        trigger_id=trigger_id,
+                        text_input=text,
+                    ),
+                )
+            except Exception:
+                logger.exception("Failed to open canvas configuration modal")
+                _respond_privately(respond, PROCESS_MODAL_FAILURE_MESSAGE)
             return
 
         if text and mode not in {"publish", "preview"}:
@@ -273,7 +337,7 @@ def _parse_command_text(text: str) -> tuple[str, str]:
 
     command, _, remainder = text.partition(" ")
     mode = command.lower()
-    if mode in {"publish", "preview", "help", "clear", "stop"}:
+    if mode in {"publish", "preview", "help", "clear", "stop", "process"}:
         return mode, remainder.strip()
     return "preview", text
 

@@ -6,7 +6,10 @@ from app.domain.schemas.extraction import (
     ExtractionResult,
     InsightItem,
 )
-from app.domain.services.canvas_composer import create_draft_canvas
+from app.domain.services.canvas_composer import (
+    create_draft_canvas,
+    create_dynamic_canvas,
+)
 
 
 def test_create_draft_canvas_renders_clean_professional_layout():
@@ -163,3 +166,95 @@ def test_create_draft_canvas_omits_empty_sections():
     assert "## Open Risks" not in canvas
     assert "## Open Questions" not in canvas
     assert "None captured" not in canvas
+
+
+def test_create_dynamic_canvas_renders_detailed_execution_sections():
+    extraction = {
+        "meeting_title": "Project Atlas Pilot Readiness Review",
+        "executive_summary": (
+            "The team confirmed BrightPath can still target a monitored pilot "
+            "launch, while Nova Retail will be delayed until enablement and "
+            "onboarding gaps are closed."
+        ),
+        "discussion_overview": (
+            "Engineering reported an unresolved permissions sync bug and duplicate "
+            "alert events. Customer Success flagged Nova's onboarding needs, and "
+            "the group aligned on launch sequencing, support ownership, metrics, "
+            "and a go or no-go checkpoint."
+        ),
+        "status_summary": "At risk pending engineering fixes and QA retest.",
+        "priority_focus": (
+            "Land permissions sync and duplicate alert fixes before the mid-week "
+            "QA retest window."
+        ),
+        "next_review_date": "2026-04-02",
+        "action_items": [
+            {
+                "content": "Fix duplicate alert dedupe logic and run replay validation",
+                "owner": "Arjun",
+                "due_date": "2026-04-01",
+                "confidence": "high",
+            }
+        ],
+        "key_decisions": [
+            {
+                "content": (
+                    "Proceed with the BrightPath pilot launch on 2026-04-06 if the "
+                    "defects are fixed by 2026-04-03."
+                ),
+                "confidence": "high",
+            }
+        ],
+        "risks": [
+            {
+                "content": (
+                    "Missing the Wednesday and Thursday QA retest window would put "
+                    "the BrightPath pilot at risk."
+                ),
+                "confidence": "medium",
+            }
+        ],
+        "open_questions": [
+            {
+                "content": (
+                    "Should low-confidence alerts stay disabled during the first "
+                    "pilot week?"
+                ),
+                "confidence": "needs_review",
+            }
+        ],
+        "custom_focus_analysis": (
+            "Leadership should watch the engineering and QA dependency closely "
+            "because the launch decision hinges on staging verification."
+        ),
+    }
+
+    canvas = create_dynamic_canvas(
+        extraction=extraction,
+        selected_options=[
+            "executive_summary",
+            "action_items",
+            "key_decisions",
+            "risks",
+            "open_questions",
+        ],
+        custom_focus_prompt="Highlight launch blockers for leadership.",
+    )
+
+    assert "# Project Atlas Pilot Readiness Review" in canvas
+    assert (
+        ":traffic_light: *Status:* At risk pending engineering fixes and QA retest."
+        in canvas
+    )
+    assert ":spiral_calendar_pad: *Next review:* 02 Apr 2026" in canvas
+    assert "## Meeting Summary" in canvas
+    assert "## Detailed Context" in canvas
+    assert "## Key Decisions" in canvas
+    assert "## Action Items" in canvas
+    assert "## Open Risks" in canvas
+    assert "## Open Questions" in canvas
+    assert "## Custom Focus" in canvas
+    assert "Proceed with the BrightPath pilot launch" in canvas
+    assert "Fix duplicate alert dedupe logic and run replay validation" in canvas
+    assert "Should low-confidence alerts stay disabled" in canvas
+    assert "Requested outputs" not in canvas

@@ -161,8 +161,7 @@ def test_followthru_preview_command_returns_canvas_preview(monkeypatch):
         "app.slack.handlers.commands.resolve_latest_huddle_notes_canvas",
         lambda *_args, **_kwargs: SimpleNamespace(
             raw_content_reference=(
-                "Decision: Ship the pilot.\n"
-                "Action: Prepare demo @maya 2026-03-20"
+                "Decision: Ship the pilot.\n" "Action: Prepare demo @maya 2026-03-20"
             ),
             source_type=SimpleNamespace(value="huddle_notes"),
         ),
@@ -284,6 +283,16 @@ def test_followthru_process_command_opens_canvas_configuration_modal(monkeypatch
         "channel_id": "C123",
         "text_input": "https://zoom.example.com/recording.mp4",
     }
+    initial_options = opened_views[0]["view"]["blocks"][0]["accessory"][
+        "initial_options"
+    ]
+    assert [option["value"] for option in initial_options] == [
+        "executive_summary",
+        "action_items",
+        "key_decisions",
+        "risks",
+        "open_questions",
+    ]
 
 
 def test_followthru_process_command_requires_zoom_link():
@@ -749,9 +758,7 @@ def test_followthru_dm_unsupported_file_returns_clear_guidance(monkeypatch):
 
     assert "That upload format is not supported yet." in messages[0]
     assert "meeting-recording.pdf" in messages[0]
-    assert "`.txt`, `.md`, `.csv`, `.tsv`, `.srt`, `.vtt`, or `.docx`" in (
-        messages[0]
-    )
+    assert "`.txt`, `.md`, `.csv`, `.tsv`, `.srt`, `.vtt`, or `.docx`" in (messages[0])
 
 
 def test_followthru_dm_long_text_uploads_transcript_artifact(monkeypatch):

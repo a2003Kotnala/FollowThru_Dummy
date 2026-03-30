@@ -1,25 +1,37 @@
 from __future__ import annotations
 
 import asyncio
+import threading
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from urllib.parse import urlparse
 
 import httpx
 
+from app.config import settings
 from app.db.base import engine
 from app.domain.services.canvas_composer import create_dynamic_canvas
 from app.domain.services.dynamic_extraction import extract_dynamic_intelligence
 from app.domain.services.parallel_whisper import transcribe_audio_chunks
 from app.integrations.slack_client import slack_client
 from app.logger import logger
-from app.workers.celery_app import celery_app
 from app.workers.media_processor import extract_audio_chunks
 
 DOWNLOAD_TIMEOUT_SECONDS = 300.0
 
+celery_app = None
+if settings.followthru_job_execution_mode != "threaded":
+    try:
+        from app.workers.celery_app import celery_app as configured_celery_app
 
-@celery_app.task(name="process_meeting_task")
+        celery_app = configured_celery_app
+    except Exception as exc:  # pragma: no cover - depends on local worker setup
+        logger.warning(
+            "Celery is unavailable; FollowThru meeting jobs will run in a thread: %s",
+            exc,
+        )
+
+
 def process_meeting_task(
     url: str,
     selected_options: list[str],
@@ -75,6 +87,30 @@ def process_meeting_task(
                     "Failed to dispose SQLAlchemy engine after meeting task: %s",
                     db_exc,
                 )
+
+
+def _delay_process_meeting_task(
+    url: str,
+    selected_options: list[str],
+    custom_prompt: str | None,
+    channel_id: str,
+    user_id: str,
+) -> None:
+    worker = threading.Thread(
+        target=process_meeting_task,
+        args=(url, selected_options, custom_prompt, channel_id, user_id),
+        daemon=True,
+        name="followthru-process-meeting",
+    )
+    worker.start()
+
+
+if celery_app is not None:
+    process_meeting_task = celery_app.task(name="process_meeting_task")(
+        process_meeting_task
+    )
+else:
+    process_meeting_task.delay = _delay_process_meeting_task
 
 
 def _download_recording(url: str, temp_dir: Path) -> Path:

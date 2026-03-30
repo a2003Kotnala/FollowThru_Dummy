@@ -28,8 +28,10 @@ from app.slack.views.canvas_modal import build_canvas_configuration_modal
 try:
     from app.domain.services.ingestion_job_service import request_job_stop
 except Exception:  # pragma: no cover - optional until ingestion service is available
+
     def request_job_stop(_channel_id: str):
         return SimpleNamespace(stopped=False, active=False)
+
 
 HELP_TEXT = (
     "*FollowThru command guide*\n"
@@ -71,9 +73,7 @@ DM_HELP_TEXT = (
     "- Start with `draft` to save a local draft without publishing.\n"
     "- Start with `publish` to create a standalone canvas you can edit and share."
 )
-DM_CLEAR_CHANNEL_MESSAGE = (
-    "`/followthru clear` only works in a DM with FollowThru."
-)
+DM_CLEAR_CHANNEL_MESSAGE = "`/followthru clear` only works in a DM with FollowThru."
 DM_STOP_CHANNEL_MESSAGE = "`/followthru stop` only works in a DM with FollowThru."
 PROCESS_MISSING_LINK_MESSAGE = (
     "Please provide a Zoom recording link after `/followthru process`."
@@ -149,8 +149,9 @@ def register_handlers(bolt_app) -> None:
         if mode == "help":
             if is_dm:
                 # Send a REAL message in DMs so it can be cleared later
-                from app.integrations.slack_client import slack_client
-                slack_client.client.chat_postMessage(channel=channel_id, text=DM_HELP_TEXT)
+                slack_client.client.chat_postMessage(
+                    channel=channel_id, text=DM_HELP_TEXT
+                )
             else:
                 # Keep channel help messages ephemeral so we don't spam the team
                 _respond_privately(respond, HELP_TEXT)
@@ -287,7 +288,10 @@ def register_handlers(bolt_app) -> None:
     def handle_followthru_dm(event, say):
         if event.get("channel_type") != "im":
             return
-        if event.get("bot_id") or event.get("subtype") in {"message_changed", "message_deleted"}:
+        if event.get("bot_id") or event.get("subtype") in {
+            "message_changed",
+            "message_deleted",
+        }:
             return
 
         dm_payload = _build_dm_source_payload(event)
@@ -297,7 +301,9 @@ def register_handlers(bolt_app) -> None:
 
         lowered = dm_payload.text.lower()
         if lowered in {"help", "hi", "hello"}:
-            slack_client.client.chat_postMessage(channel=event["channel"], text=DM_HELP_TEXT)
+            slack_client.client.chat_postMessage(
+                channel=event["channel"], text=DM_HELP_TEXT
+            )
             return
 
         status_message = say(text=DM_PROCESSING_MESSAGE)
@@ -607,8 +613,10 @@ def _clear_dm_bot_messages(channel_id: str, history_limit: int = 100) -> int:
 
 def _is_followthru_bot_message(message: dict) -> bool:
     subtype = message.get("subtype")
-    from app.config import settings
-    return bool(message.get("bot_id") or subtype == "bot_message" or "bot_profile" in message)
+    return bool(
+        message.get("bot_id") or subtype == "bot_message" or "bot_profile" in message
+    )
+
 
 def _build_dm_clear_message(
     clear_result,
@@ -644,9 +652,7 @@ def _build_dm_file_support_message(dm_payload: DMSourcePayload) -> str:
         )
 
     if dm_payload.unsupported_files:
-        file_names = ", ".join(
-            f"`{name}`" for name in dm_payload.unsupported_files[:3]
-        )
+        file_names = ", ".join(f"`{name}`" for name in dm_payload.unsupported_files[:3])
         return (
             ":paperclip: *That upload format is not supported yet.*\n"
             f"_I can currently process transcript files in "

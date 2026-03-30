@@ -89,6 +89,28 @@ def extract_structured_meeting_data(raw_content: str) -> ExtractionResult:
                 exc,
             )
 
+    return extract_structured_meeting_data_with_rules(prepared_content)
+
+
+def extract_structured_meeting_data_with_rules(raw_content: str) -> ExtractionResult:
+    normalized = raw_content.strip()
+    if not normalized:
+        return ExtractionResult(
+            meeting_title="Execution Review",
+            summary="No meeting content was provided.",
+            what_happened="No meeting content was provided.",
+            status_summary="Needs input",
+            priority_focus="Capture meeting notes to generate a tracking draft.",
+        )
+
+    prepared_content = _prepare_content_for_extraction(normalized)
+    if prepared_content != normalized:
+        logger.info(
+            "Compacted meeting content from %s to %s chars before rule extraction",
+            len(normalized),
+            len(prepared_content),
+        )
+
     return _extract_with_rules(prepared_content)
 
 

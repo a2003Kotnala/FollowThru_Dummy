@@ -2,6 +2,14 @@ from __future__ import annotations
 
 import json
 
+DEFAULT_CANVAS_OPTIONS = [
+    "executive_summary",
+    "action_items",
+    "key_decisions",
+    "risks",
+    "open_questions",
+]
+
 
 def build_canvas_configuration_modal(
     channel_id: str,
@@ -39,7 +47,10 @@ def build_canvas_configuration_modal(
                 "block_id": "canvas_options",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "Choose what FollowThru should extract from the recording.",
+                    "text": (
+                        "Detailed canvas sections are preselected. "
+                        "Uncheck anything you do not want, or add a custom focus."
+                    ),
                 },
                 "accessory": {
                     "type": "checkboxes",
@@ -73,6 +84,50 @@ def build_canvas_configuration_modal(
                             },
                             "value": "risks",
                         },
+                        {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Open Questions",
+                            },
+                            "value": "open_questions",
+                        },
+                    ],
+                    "initial_options": [
+                        {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Executive Summary",
+                            },
+                            "value": "executive_summary",
+                        },
+                        {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Action Items",
+                            },
+                            "value": "action_items",
+                        },
+                        {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Key Decisions",
+                            },
+                            "value": "key_decisions",
+                        },
+                        {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Risks",
+                            },
+                            "value": "risks",
+                        },
+                        {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Open Questions",
+                            },
+                            "value": "open_questions",
+                        },
                     ],
                 },
             },
@@ -90,7 +145,10 @@ def build_canvas_configuration_modal(
                     "multiline": True,
                     "placeholder": {
                         "type": "plain_text",
-                        "text": "Optional: highlight blockers, client asks, delivery gaps, or any custom angle.",
+                        "text": (
+                            "Optional: highlight blockers, client asks, "
+                            "delivery gaps, or any custom angle."
+                        ),
                     },
                 },
             },

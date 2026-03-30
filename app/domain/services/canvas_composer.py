@@ -1,7 +1,12 @@
 import re
 from datetime import date, datetime
 
-from app.domain.schemas.extraction import ActionItem, ExtractionResult, InsightItem
+from app.domain.schemas.extraction import (
+    ActionItem,
+    Confidence,
+    ExtractionResult,
+    InsightItem,
+)
 
 STATUS_MAX_WORDS = 24
 PRIORITY_MAX_WORDS = 18
@@ -27,9 +32,10 @@ def create_draft_canvas(
         build_questions_section(extraction.open_questions),
         build_footer(source_label),
     ]
-    return f"\n\n{divider()}\n\n".join(
-        section for section in sections if section.strip()
-    ) + "\n"
+    return (
+        f"\n\n{divider()}\n\n".join(section for section in sections if section.strip())
+        + "\n"
+    )
 
 
 def create_dynamic_canvas(
@@ -38,39 +44,37 @@ def create_dynamic_canvas(
     custom_focus_prompt: str | None = None,
     source_label: str = "zoom_recording",
 ) -> str:
-    selected_labels = _selected_output_label_text(
-        selected_options=selected_options,
-        custom_focus_prompt=custom_focus_prompt,
-    )
-    title = str(extraction.get("meeting_title") or "").strip()
-    if not title:
-        title = f"Meeting - {datetime.now().strftime('%Y-%m-%d')}"
+    normalized_extraction = _coerce_dynamic_extraction_result(extraction)
+    normalized_options = set(_normalize_dynamic_selected_options(selected_options))
+    render_all_optional_sections = not normalized_options
 
     sections = [
-        "\n".join(
-            [
-                header(title),
-                f":calendar: {bold('Date:')} {datetime.now().strftime('%d %b %Y')}",
-                f":mag: {bold('Requested outputs:')} {selected_labels}",
-            ]
-        )
+        build_meta_section(
+            normalized_extraction,
+            source_label,
+            normalized_extraction.meeting_title
+            or f"Meeting - {datetime.now().strftime('%Y-%m-%d')}",
+        ),
+        build_summary_section(normalized_extraction),
     ]
 
-    executive_summary = _coerce_text(extraction.get("executive_summary"))
-    if executive_summary:
-        sections.append(_build_dynamic_text_section("Executive Summary", executive_summary))
+    discussion_overview = _coerce_text(extraction.get("discussion_overview"))
+    if discussion_overview:
+        sections.append(
+            _build_dynamic_text_section("Detailed Context", discussion_overview)
+        )
 
-    decisions = _coerce_insight_items(extraction.get("key_decisions"))
-    if decisions:
-        sections.append(build_decisions_section(decisions))
+    if render_all_optional_sections or "key_decisions" in normalized_options:
+        sections.append(build_decisions_section(normalized_extraction.decisions))
 
-    action_items = _coerce_action_items(extraction.get("action_items"))
-    if action_items:
-        sections.append(build_action_items_section(action_items))
+    if render_all_optional_sections or "action_items" in normalized_options:
+        sections.append(build_action_items_section(normalized_extraction.action_items))
 
-    risks = _coerce_insight_items(extraction.get("risks"))
-    if risks:
-        sections.append(build_risks_section(risks))
+    if render_all_optional_sections or "risks" in normalized_options:
+        sections.append(build_risks_section(normalized_extraction.risks))
+
+    if render_all_optional_sections or "open_questions" in normalized_options:
+        sections.append(build_questions_section(normalized_extraction.open_questions))
 
     custom_focus_analysis = _coerce_text(extraction.get("custom_focus_analysis"))
     if custom_focus_analysis:
@@ -78,7 +82,7 @@ def create_dynamic_canvas(
             _build_custom_focus_section(custom_focus_prompt, custom_focus_analysis)
         )
 
-    if len(sections) == 1:
+    if not any(section.strip() for section in sections[1:]):
         sections.append(
             _build_dynamic_text_section(
                 "Executive Summary",
@@ -87,9 +91,10 @@ def create_dynamic_canvas(
         )
 
     sections.append(build_footer(source_label))
-    return f"\n\n{divider()}\n\n".join(
-        section for section in sections if section.strip()
-    ) + "\n"
+    return (
+        f"\n\n{divider()}\n\n".join(section for section in sections if section.strip())
+        + "\n"
+    )
 
 
 def divider() -> str:
@@ -290,6 +295,127 @@ def _coerce_action_items(value: object) -> list[ActionItem]:
     return items
 
 
+def _coerce_dynamic_extraction_result(
+    extraction: dict[str, object]
+) -> ExtractionResult:
+    action_items = _coerce_action_items(extraction.get("action_items"))
+    decisions = _coerce_insight_items(extraction.get("key_decisions"))
+    risks = _coerce_insight_items(extraction.get("risks"))
+    open_questions = _coerce_insight_items(extraction.get("open_questions"))
+    owners = _coerce_owner_list(extraction.get("owners"))
+    if not owners:
+        owners = _unique_preserving_order(
+            item.owner for item in action_items if item.owner
+        )
+
+    due_dates = _unique_preserving_order(
+        item.due_date for item in action_items if item.due_date
+    )
+    next_review_date = _coerce_date_value(extraction.get("next_review_date"))
+    if next_review_date is None and due_dates:
+        next_review_date = due_dates[0]
+
+    discussion_overview = _coerce_text(extraction.get("discussion_overview"))
+    summary = _coerce_text(extraction.get("executive_summary")) or discussion_overview
+    status_summary = _coerce_text(
+        extraction.get("status_summary")
+    ) or _derive_dynamic_status_summary(
+        action_items,
+        open_questions,
+        risks,
+    )
+    priority_focus = _coerce_text(
+        extraction.get("priority_focus")
+    ) or _derive_dynamic_priority_focus(
+        action_items,
+        risks,
+        open_questions,
+        decisions,
+    )
+    confidence = (
+        Confidence.high
+        if any(
+            [
+                summary,
+                discussion_overview,
+                decisions,
+                action_items,
+                risks,
+                open_questions,
+            ]
+        )
+        else Confidence.needs_review
+    )
+
+    return ExtractionResult(
+        meeting_title=_coerce_text(extraction.get("meeting_title"))
+        or f"Meeting - {datetime.now().strftime('%Y-%m-%d')}",
+        summary=summary,
+        what_happened="",
+        status_summary=status_summary,
+        priority_focus=priority_focus,
+        next_review_date=next_review_date,
+        decisions=decisions,
+        action_items=action_items,
+        owners=owners,
+        due_dates=due_dates,
+        open_questions=open_questions,
+        risks=risks,
+        confidence_overall=confidence,
+    )
+
+
+def _coerce_date_value(value: object) -> date | None:
+    if isinstance(value, date):
+        return value
+    if isinstance(value, str):
+        cleaned = value.strip()
+        if not cleaned:
+            return None
+        try:
+            return date.fromisoformat(cleaned)
+        except ValueError:
+            return None
+    return None
+
+
+def _coerce_owner_list(value: object) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    owners: list[str] = []
+    for entry in value:
+        cleaned = _coerce_text(entry)
+        if cleaned and cleaned not in owners:
+            owners.append(cleaned)
+    return owners
+
+
+def _normalize_dynamic_selected_options(
+    selected_options: list[str] | None,
+) -> list[str]:
+    allowed = {
+        "executive_summary",
+        "action_items",
+        "key_decisions",
+        "risks",
+        "open_questions",
+    }
+    normalized: list[str] = []
+    for option in selected_options or []:
+        cleaned = str(option).strip()
+        if cleaned and cleaned in allowed and cleaned not in normalized:
+            normalized.append(cleaned)
+    return normalized
+
+
+def _unique_preserving_order(values):
+    unique_values = []
+    for value in values:
+        if value not in unique_values:
+            unique_values.append(value)
+    return unique_values
+
+
 def _selected_option_label(option: str) -> str:
     return {
         "executive_summary": "Executive Summary",
@@ -317,6 +443,37 @@ def _owner_label(item: ActionItem) -> str:
     if item.owner:
         return item.owner
     return "Needs review"
+
+
+def _derive_dynamic_status_summary(
+    action_items: list[ActionItem],
+    open_questions: list[InsightItem],
+    risks: list[InsightItem],
+) -> str:
+    if risks:
+        return "At risk"
+    if open_questions:
+        return "Needs follow-up"
+    if action_items:
+        return "Execution in progress"
+    return "Needs review"
+
+
+def _derive_dynamic_priority_focus(
+    action_items: list[ActionItem],
+    risks: list[InsightItem],
+    open_questions: list[InsightItem],
+    decisions: list[InsightItem],
+) -> str:
+    if risks:
+        return risks[0].content
+    if open_questions:
+        return open_questions[0].content
+    if action_items:
+        return action_items[0].content
+    if decisions:
+        return decisions[0].content
+    return "Confirm next steps and owners."
 
 
 def _status_label(item: ActionItem) -> str:

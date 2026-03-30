@@ -1,0 +1,154 @@
+Meeting Title: Project Atlas Pilot Readiness Review
+Date: 30 March 2026
+Duration: 62 minutes
+Participants: Rohan (Program Lead), Anita (Engineering Manager), Maya (Product Manager), Vivek (QA Lead), Neha (Customer Success), Arjun (Data Engineer), Priya (Design), Karan (Sales)
+
+Rohan: Thanks everyone. The goal today is to lock the pilot launch plan for Project Atlas, review blockers, and confirm who owns what before Friday. We need a clean view on launch readiness, customer communication, support prep, and reporting.
+
+Maya: Quick context. Atlas is the new workflow dashboard for enterprise customers. We promised the pilot to two design partners, BrightPath Logistics and Nova Retail. Both are expecting access next week, but only if we can confirm role-based permissions, CSV export, and alert notifications.
+
+Anita: Engineering status first. Core dashboard is stable in staging. The permissions layer is coded, but we still have one issue with manager-level overrides not syncing correctly after role changes. That bug is not affecting all users, but it is a real launch risk if we leave it unresolved.
+
+Arjun: On the data side, nightly pipeline latency is down from twenty-three minutes to nine minutes after the warehouse optimization. However, we still see duplicate alert events in around three percent of records when the upstream CRM sends rapid status changes.
+
+Vivek: QA has finished regression on the dashboard views, filters, and export flows. We passed 84 of 91 tests. The remaining seven failures are linked to permissions edge cases and duplicate alerts. If those get fixed by Wednesday noon, we can complete retesting by Thursday evening.
+
+Neha: Customer Success spoke with BrightPath yesterday. They are okay with a pilot if we set expectations that alerts are still in "monitored release" mode. Nova Retail is more sensitive. They specifically want onboarding docs and one named support contact before they agree to go live.
+
+Karan: Sales already hinted to Nova that the experience would be production-ready, so we need to be careful with wording. If we call this a beta too aggressively, we may create a commercial problem. But if we overpromise, support will take the hit next week.
+
+Priya: From a UX side, onboarding is fine for internal users, but the first-run empty state is still weak. It tells people there is no data, but it does not tell them how to connect sources or where to start. That will create confusion in the pilot.
+
+Rohan: Okay, let us separate decisions from discussion. First question: are we still targeting the pilot launch next Monday?
+
+Maya: My recommendation is yes, but only for BrightPath and only if permissions and alert duplication are resolved by Thursday. For Nova, I would prefer a controlled delay of three business days unless onboarding assets are ready.
+
+Anita: I agree. BrightPath is workable because they are collaborative. Nova is going to expect enterprise polish from day one.
+
+Neha: Same here. BrightPath can join on Monday with the monitored-release disclaimer. Nova should wait until the enablement materials are complete.
+
+Decision: Proceed with the BrightPath pilot launch on 2026-04-06 if permissions sync and duplicate alert defects are fixed by 2026-04-03.
+
+Decision: Delay Nova Retail onboarding until onboarding documentation, named support ownership, and first-run experience improvements are completed.
+
+Rohan: Good. Next, let us clarify non-negotiables for BrightPath.
+
+Vivek: Non-negotiable items from QA are stable permissions, no duplicate alerts during normal usage, and export validation for at least the top five report templates.
+
+Arjun: I can handle the duplicate alert issue. The working theory is that our dedupe window is too short when multiple CRM events arrive within the same second. I can patch that and replay last week's sample data.
+
+Action: Arjun to fix duplicate alert dedupe logic and run replay validation by 2026-04-01.
+
+Anita: I will assign Sandeep from the backend team to pair with me on the permissions sync bug. We have already isolated the role-cache invalidation path, so I expect a patch by tomorrow night.
+
+Action: Anita to ship the permissions sync fix with Sandeep and confirm staging verification by 2026-03-31.
+
+Maya: I will revise the launch checklist so it clearly separates "BrightPath Monday launch" from "Nova delayed onboarding" because right now the Notion page mixes the two and people are assuming both accounts go live together.
+
+Action: Maya to update the pilot launch checklist and publish the revised rollout plan by 2026-03-31.
+
+Neha: I can own the customer-facing onboarding pack for Nova and a simpler quick-start guide for BrightPath. But I need final screenshots and the alert wording from product by tomorrow afternoon.
+
+Action: Neha to draft BrightPath quick-start and Nova onboarding pack by 2026-04-02.
+
+Action: Priya to provide updated onboarding screenshots and improved empty-state copy by 2026-03-31.
+
+Karan: I will reset expectations with Nova. I want a careful message: not "we are delayed because the product is unstable," but "we are scheduling a guided onboarding window to ensure the team gets the right setup and enablement."
+
+Action: Karan to send revised Nova customer communication draft for review by 2026-03-31.
+
+Rohan: Support owner?
+
+Neha: I can be the named support lead for week one, but only if we create an escalation rotation. Otherwise everything will land with Customer Success.
+
+Decision: Neha will be the named support owner for BrightPath pilot week one, with engineering escalation routed through Anita.
+
+Action: Anita to create pilot-week escalation rota with backend and frontend contacts by 2026-04-01.
+
+Rohan: What about reporting and success metrics? We need something measurable beyond "customer liked it."
+
+Maya: Proposed pilot metrics are weekly active users greater than ten, report export success rate above ninety-five percent, alert click-through above twenty percent, and less than five support tickets in the first week.
+
+Arjun: We can track all of those except alert click-through right now. Click-through instrumentation exists in the frontend, but the event is not being forwarded to the warehouse consistently.
+
+Risk: Pilot success metric for alert click-through may be unreliable because analytics forwarding from the frontend is incomplete.
+
+Action: Arjun to verify alert click-through event pipeline and patch analytics forwarding if needed by 2026-04-02.
+
+Priya: I also want to flag one UX risk. In the current design, the export button is placed under the overflow menu on smaller screens. During usability testing, three out of five users missed it entirely.
+
+Risk: Export discoverability on smaller screens is weak and may reduce perceived product readiness during the pilot.
+
+Decision: Keep export in the overflow for the BrightPath pilot, but prioritize a more visible placement before wider rollout.
+
+Action: Priya to propose a revised export button placement for post-pilot release by 2026-04-05.
+
+Vivek: One more QA concern. Our automated tests do not cover role changes during an active session. That is exactly the permissions area we are struggling with.
+
+Risk: Permissions could appear correct on fresh login but fail after live role changes during active sessions.
+
+Action: Vivek to add active-session permission test coverage and share results by 2026-04-02.
+
+Rohan: Budget and staffing check. Any blockers on team bandwidth?
+
+Anita: Engineering can manage this week, but not if we add scoped requests from Sales. We need a freeze on nice-to-have items until BrightPath is live.
+
+Decision: Freeze non-critical feature requests until the BrightPath pilot is live.
+
+Karan: That is fair. I only need a one-page summary for customers and internal account teams.
+
+Action: Maya to prepare a one-page pilot capability summary for Sales and CS by 2026-04-01.
+
+Neha: We should also decide how we describe the release internally. If support sees "production launch" in Slack but engineering sees "monitored release," there will be confusion.
+
+Decision: Use the phrase "monitored pilot launch" in all internal and external communication for BrightPath.
+
+Action: Rohan to post the official launch terminology and success criteria in the project channel by 2026-03-31.
+
+Rohan: Let us talk about open questions before we close.
+
+Question: Do we want BrightPath users to receive all alert categories on day one, or should low-confidence alerts stay disabled for the first week?
+
+Question: Should Nova receive sandbox access before their delayed guided onboarding, or do we avoid access until training materials are complete?
+
+Question: Do we need a legal review for the pilot analytics disclaimer now that usage metrics will be shown in customer-facing dashboards?
+
+Maya: On the first question, my suggestion is to enable only high-confidence and medium-confidence alerts for week one. Low-confidence alerts create too much noise and will distract from the workflow value.
+
+Anita: Agreed.
+
+Decision: Enable only high-confidence and medium-confidence alerts for the first week of the BrightPath pilot.
+
+Action: Anita to confirm alert-threshold configuration in staging by 2026-04-02.
+
+Neha: About sandbox access for Nova, I would avoid it until the onboarding session. If they enter without guidance, we will spend more time untangling confusion later.
+
+Decision: Do not provide Nova sandbox access before the guided onboarding session.
+
+Rohan: Legal review?
+
+Karan: I spoke to legal informally. They said no full review is needed if the analytics dashboard remains aggregate and does not expose employee-level behavior, but we should still add a short disclaimer to the onboarding deck.
+
+Action: Karan to add analytics disclaimer language to the onboarding deck by 2026-04-02.
+
+Priya: One final design note. The current empty state says "No records found." I recommend changing that to "Connect a source to begin tracking workflow performance" with a link to setup steps.
+
+Decision: Approve the new first-run empty-state message proposed by Priya.
+
+Action: Priya to update the empty-state copy in staging by 2026-03-31.
+
+Vivek: If engineering lands their fixes tomorrow, QA can retest on Wednesday and Thursday. If we miss that window, the Monday date becomes risky.
+
+Risk: Missing the Wednesday/Thursday QA retest window would put the 2026-04-06 BrightPath pilot at risk.
+
+Rohan: Good call. Let us define the escalation point.
+
+Decision: If permissions sync or duplicate alert fixes are not verified in staging by 2026-04-02 at 17:00 IST, Rohan will trigger a launch go/no-go review.
+
+Action: Rohan to schedule a go/no-go checkpoint for 2026-04-02 at 17:00 IST.
+
+Maya: Summarizing back: BrightPath is still targeted for Monday as a monitored pilot launch, Nova is delayed, engineering and QA have a tight mid-week dependency, Success and Sales will align messaging, and design plus analytics cleanup continue in parallel.
+
+Rohan: Exactly. Please update the tracker today. No additional scope this week. If anyone hits a blocker, post it in the Atlas war room immediately.
+
+Meeting closed at 4:32 PM.

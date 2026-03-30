@@ -7,15 +7,14 @@ from app.domain.schemas.extraction import ExtractionResult
 
 
 class OpenAIClient:
-    def __init__(self) -> None:
-        self.base_url = settings.resolved_llm_base_url
-
     def is_configured(self) -> bool:
-        return bool(settings.llm_api_key)
+        return bool(settings.resolved_llm_api_key)
 
     def extract_meeting_data(self, raw_content: str) -> ExtractionResult:
-        if not settings.llm_api_key:
-            raise RuntimeError("LLM_API_KEY or OPENAI_API_KEY is not configured.")
+        if not settings.resolved_llm_api_key:
+            raise RuntimeError(
+                "No LLM API key is configured. Set OPENAI_API_KEY, GEMINI_API_KEY, or LLM_API_KEY."
+            )
 
         prompt = (
             "Extract structured meeting data from the notes below.\n"
@@ -58,8 +57,10 @@ class OpenAIClient:
         messages: list[dict[str, str]],
         user_input: str,
     ) -> str:
-        if not settings.llm_api_key:
-            raise RuntimeError("LLM_API_KEY or OPENAI_API_KEY is not configured.")
+        if not settings.resolved_llm_api_key:
+            raise RuntimeError(
+                "No LLM API key is configured. Set OPENAI_API_KEY, GEMINI_API_KEY, or LLM_API_KEY."
+            )
 
         conversation = [
             {
@@ -97,9 +98,9 @@ class OpenAIClient:
 
         with httpx.Client(timeout=settings.llm_timeout_seconds) as client:
             response = client.post(
-                f"{self.base_url}/chat/completions",
+                f"{settings.resolved_llm_base_url}/chat/completions",
                 headers={
-                    "Authorization": f"Bearer {settings.llm_api_key}",
+                    "Authorization": f"Bearer {settings.resolved_llm_api_key}",
                     "Content-Type": "application/json",
                 },
                 json=payload,
